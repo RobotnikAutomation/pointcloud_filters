@@ -85,22 +85,33 @@ void LowerResolutionFilter::failureState()
   // Failure state...
 }
 
-sensor_msgs::PointCloud2 LowerResolutionFilter::pointCloudFilter(const sensor_msgs::PointCloud2::ConstPtr& msg)
+sensor_msgs::PointCloud2 LowerResolutionFilter::pointCloudFilter(sensor_msgs::PointCloud2 pointcloud)
 {
   sensor_msgs::PointCloud2 pointcloud_filtered;
 
-  pointcloud_filtered.header = msg->header;
-  pointcloud_filtered.width = msg->width;
-  pointcloud_filtered.height = msg->height;
-  pointcloud_filtered.fields = msg->fields;
-  pointcloud_filtered.is_bigendian = msg->is_bigendian;
-  pointcloud_filtered.point_step = msg->point_step;
-  pointcloud_filtered.row_step = msg->row_step;
-  pointcloud_filtered.is_dense = msg->is_dense;
-  pointcloud_filtered.data.resize(msg->data.size());
-  pointcloud_filtered.data = msg->data;
+  pointcloud_filtered.header = pointcloud.header;
+  pointcloud_filtered.width = std::floor(pointcloud.width / reduce_points_factor_);
+  pointcloud_filtered.height = pointcloud.height;
+  pointcloud_filtered.fields = pointcloud.fields;
+  pointcloud_filtered.is_bigendian = pointcloud.is_bigendian;
+  pointcloud_filtered.point_step = pointcloud.point_step;
+  pointcloud_filtered.row_step = pointcloud_filtered.point_step * pointcloud_filtered.width;
+  pointcloud_filtered.is_dense = pointcloud.is_dense;
+  pointcloud_filtered.data.resize(pointcloud_filtered.width * pointcloud_filtered.height * pointcloud_filtered.point_step);
 
-  RCOMPONENT_ERROR_STREAM("TEST");
+  int max_rs = pointcloud_filtered.row_step;
+  int max_ps = pointcloud_filtered.point_step;
+
+  for (int h = 0; h < pointcloud_filtered.height; h++)
+  {
+    for (int w = 0; w < pointcloud_filtered.width; w++)
+    {
+      for (int ps = 0; ps < pointcloud_filtered.point_step; ps++)
+      {
+        pointcloud_filtered.data[h*max_rs + w*max_ps + ps] = pointcloud.data[(h*max_rs + w*max_ps)*reduce_points_factor_ + ps];
+      }
+    }
+  }
 
   return pointcloud_filtered;
 }

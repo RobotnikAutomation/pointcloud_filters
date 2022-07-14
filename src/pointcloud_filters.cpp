@@ -58,7 +58,7 @@ void PointCloudFilters::rosPublish()
     status_stamped_pub_.publish(status_stamped);
   }
   
-  pointcloud_pub_.publish(pointcloud_filtered_);
+  pointcloud_pub_.publish(pointCloudFilter(pointcloud_));
 }
 
 void PointCloudFilters::initState()
@@ -101,27 +101,23 @@ void PointCloudFilters::failureState()
   RComponent::failureState();
 }
 
-sensor_msgs::PointCloud2 PointCloudFilters::pointCloudFilter(const sensor_msgs::PointCloud2::ConstPtr& msg)
+sensor_msgs::PointCloud2 PointCloudFilters::pointCloudFilter(sensor_msgs::PointCloud2 pointcloud)
 {
-  sensor_msgs::PointCloud2 pointcloud_filtered;
-
-  pointcloud_filtered.header = msg->header;
-  pointcloud_filtered.width = msg->width;
-  pointcloud_filtered.height = msg->height;
-  pointcloud_filtered.fields = msg->fields;
-  pointcloud_filtered.is_bigendian = msg->is_bigendian;
-  pointcloud_filtered.point_step = msg->point_step;
-  pointcloud_filtered.row_step = msg->row_step;
-  pointcloud_filtered.is_dense = msg->is_dense;
-  pointcloud_filtered.data.resize(msg->data.size());
-  pointcloud_filtered.data = msg->data;
-
-  return pointcloud_filtered;
+  return pointcloud;
 }
 
 void PointCloudFilters::pointCloudSubCb(const sensor_msgs::PointCloud2::ConstPtr& msg)
 {
-  pointcloud_filtered_ = pointCloudFilter(msg);
+  pointcloud_.header = msg->header;
+  pointcloud_.width = msg->width;
+  pointcloud_.height = msg->height;
+  pointcloud_.fields = msg->fields;
+  pointcloud_.is_bigendian = msg->is_bigendian;
+  pointcloud_.point_step = msg->point_step;
+  pointcloud_.row_step = msg->row_step;
+  pointcloud_.is_dense = msg->is_dense;
+  pointcloud_.data.resize(msg->data.size());
+  pointcloud_.data = msg->data;
 
   tickTopicsHealth("pointcloud_sub");
 }

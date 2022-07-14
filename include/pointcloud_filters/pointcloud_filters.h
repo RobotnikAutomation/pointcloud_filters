@@ -68,9 +68,9 @@ protected:
   /* PointCloudFilters stuff */
 
   std_msgs::String status_;
-  sensor_msgs::PointCloud2 pointcloud_filtered_;
+  sensor_msgs::PointCloud2 pointcloud_;
 
-  virtual sensor_msgs::PointCloud2 pointCloudFilter(const sensor_msgs::PointCloud2::ConstPtr& msg);
+  virtual sensor_msgs::PointCloud2 pointCloudFilter(sensor_msgs::PointCloud2 pointcloud);
 
   /* PointCloudFilters stuff !*/
 

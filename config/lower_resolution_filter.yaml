@@ -1,2 +1,2 @@
-reduce_points_factor: 4
-desired_freq: 4.0 # in Hz
+reduce_points_factor: 6 # Horizontal resolution reduction factor
+desired_freq: 2.0 # in Hz

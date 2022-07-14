@@ -53,7 +53,7 @@ protected:
 
   int reduce_points_factor_;
 
-  sensor_msgs::PointCloud2 pointCloudFilter(const sensor_msgs::PointCloud2::ConstPtr& msg);
+  sensor_msgs::PointCloud2 pointCloudFilter(sensor_msgs::PointCloud2 pointcloud);
 
   //! LowerResolutionFilter variables and methods...
 
