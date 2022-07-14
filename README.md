@@ -2,54 +2,33 @@
 
 The pointcloud_filters package, based on RComponent structure. Node to filter a PointCloud2 message.
 
-## Installation
+## 1 lower_resolution_filter
 
-(Optional)
-
-
-## 1 node_name
-
-does...
+This node filters a PointCloud2 message in a "n" factor to decrease the bandwidth required for the website. It also reduces the frequency of the publication.
 
 ### 1.1 Parameters
 
-* ~parameter_name (type, default: value)
-   description
+* ~reduce_points_factor (int, default: 4)
+   Decrease pointcloud size factor.
+* ~desired_freq (double, default: 4.0)
+   Publication frequency of the filtered PointCloud
+* ~pointcloud_in (string, default: front_rgbd_camera/depth/points)
+   Topic name of the input PointCloud
+* ~pointcloud_filtered (string, default: throttle/front_rgbd_camera/depth/points)
+   Topic name of the filtered PointCloud
    
 ### 1.2 Subscribed Topics
 
-* foo/topic_name1 (std_msgs/String)
-  topic_desciption 1
+* front_rgbd_camera/depth/points (sensor_msgs/PointCloud2)
+  Topic with the raw PointCloud
 
 ### 1.3 Published Topics
 
-* foo/topic_name (std_msgs/String)
-  topic description, including any important rate information
+* throttle/front_rgbd_camera/depth/points (sensor_msgs/PointCloud2)
+  Topic with the filtered PointCloud
 
-### 1.4 Services
-* foo/service_name (nav_msgs/GetMap)
-  service description
+### 1.4 Bringup
 
-### 1.5 Services Called
-* foo/service_name (nav_msgs/GetMap)
-  service description
-
-### 1.6 Action server
-* foo/service_name (move_base_msgs/MoveBaseAction)
-  Action service description
-
-### 1.7 Action clients called
-* foo/service_name (move_base_msgs/MoveBaseAction)
-  Action service description
-
-### 1.8 Required tf Transforms
-* foo → bar
-  description of transform
-
-### 1.9 Provided tf Transforms
-* baz → mumble
-  description of transform
-
-### 1.10 Bringup
-
-(optional)
+```bash
+roslaunch pointcloud_filters lower_resolution_filter.launch
+```
