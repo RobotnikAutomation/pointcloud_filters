@@ -16,7 +16,8 @@ void PointCloudFilters::rosReadParams()
   bool not_required = false;
 
   readParam(pnh_, "desired_freq", desired_freq_, 40.0, not_required);
-  readParam(pnh_, "example_subscriber_name", example_subscriber_name_, "example", not_required);
+  readParam(pnh_, "pointcloud_in", pointcloud_in_name_, "front_rgbd_camera/depth/points", required);
+  readParam(pnh_, "pointcloud_filtered", pointcloud_filtered_name_, "throttle/front_rgbd_camera/depth/points", required);
 }
 
 int PointCloudFilters::rosSetup()
@@ -30,12 +31,11 @@ int PointCloudFilters::rosSetup()
   status_pub_ = pnh_.advertise<std_msgs::String>("status", 10);
   status_stamped_pub_ = pnh_.advertise<robotnik_msgs::StringStamped>("status_stamped", 10);
 
-  // Subscriber
-  example_sub_ = nh_.subscribe<std_msgs::String>(example_subscriber_name_, 10, &PointCloudFilters::exampleSubCb, this);
-  addTopicsHealth(&example_sub_, "example_sub", 50.0, not_required);
+  pointcloud_pub_ = nh_.advertise<sensor_msgs::PointCloud2>(pointcloud_filtered_name_, 10);
 
-  // Service
-  example_server_ = pnh_.advertiseService("example", &PointCloudFilters::exampleServerCb, this);
+  // Subscriber
+  pointcloud_sub_ = nh_.subscribe<sensor_msgs::PointCloud2>(pointcloud_in_name_, 10, &PointCloudFilters::pointCloudSubCb, this);
+  addTopicsHealth(&pointcloud_sub_, "pointcloud_sub", 5.0, required);
 }
 
 int PointCloudFilters::rosShutdown()
@@ -57,6 +57,8 @@ void PointCloudFilters::rosPublish()
     status_stamped.string = status_.data;
     status_stamped_pub_.publish(status_stamped);
   }
+  
+  pointcloud_pub_.publish(pointcloud_filtered_);
 }
 
 void PointCloudFilters::initState()
@@ -99,27 +101,28 @@ void PointCloudFilters::failureState()
   RComponent::failureState();
 }
 
-void PointCloudFilters::exampleSubCb(const std_msgs::String::ConstPtr& msg)
+sensor_msgs::PointCloud2 PointCloudFilters::pointCloudFilter(const sensor_msgs::PointCloud2::ConstPtr& msg)
 {
-  RCOMPONENT_WARN_STREAM("Received msg: " + msg->data);
+  sensor_msgs::PointCloud2 pointcloud_filtered;
 
-  tickTopicsHealth("example_sub");
+  pointcloud_filtered.header = msg->header;
+  pointcloud_filtered.width = msg->width;
+  pointcloud_filtered.height = msg->height;
+  pointcloud_filtered.fields = msg->fields;
+  pointcloud_filtered.is_bigendian = msg->is_bigendian;
+  pointcloud_filtered.point_step = msg->point_step;
+  pointcloud_filtered.row_step = msg->row_step;
+  pointcloud_filtered.is_dense = msg->is_dense;
+  pointcloud_filtered.data.resize(msg->data.size());
+  pointcloud_filtered.data = msg->data;
+
+  return pointcloud_filtered;
 }
 
-bool PointCloudFilters::exampleServerCb(std_srvs::Trigger::Request& request, std_srvs::Trigger::Response& response)
+void PointCloudFilters::pointCloudSubCb(const sensor_msgs::PointCloud2::ConstPtr& msg)
 {
-  RCOMPONENT_WARN_STREAM("Received srv trigger petition.");
-  if (state != robotnik_msgs::State::READY_STATE)
-  {
-    response.success = false;
-    response.message = "Received srv trigger petition. Component not ready.";
-    return true;
-  }
-  else
-  {
-    response.success = true;
-    response.message = "Received srv trigger petition. Component ready.";
-    return true;
-  }
-  return false;
+  pointcloud_filtered_ = pointCloudFilter(msg);
+
+  tickTopicsHealth("pointcloud_sub");
 }
+

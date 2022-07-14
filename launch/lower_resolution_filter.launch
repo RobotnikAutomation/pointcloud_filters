@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<launch>
+	<arg name="debug" default="false"/>
+    <arg     if="$(arg debug)" name="launch_prefix" default="gdb -ex run --args"/>
+    <arg unless="$(arg debug)" name="launch_prefix" default=""/>
+
+	<arg name="pointcloud_in" default="front_rgbd_camera/depth/points" />
+	<arg name="pointcloud_filtered" default="throttle/front_rgbd_camera/depth/points" />
+
+	<!-- start LowerResolutionFilter node -->
+	<node name="lower_resolution_filter" pkg="pointcloud_filters" type="lower_resolution_filter_node" output="screen" respawn="false" launch-prefix="$(arg launch_prefix)">
+		<rosparam command="load" file="$(find pointcloud_filters)/config/lower_resolution_filter.yaml"/>
+		<param name="pointcloud_in" value="$(arg pointcloud_in)"/>
+		<param name="pointcloud_filtered" value="$(arg pointcloud_filtered)"/>
+	</node>
+
+</launch>

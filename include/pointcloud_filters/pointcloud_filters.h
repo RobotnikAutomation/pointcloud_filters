@@ -9,6 +9,7 @@
 // Insert here msg and srv includes:
 #include <std_msgs/String.h>
 #include <robotnik_msgs/StringStamped.h>
+#include <sensor_msgs/PointCloud2.h>
 
 #include <std_srvs/Trigger.h>
 
@@ -49,27 +50,29 @@ protected:
   //! To publish the basic information
   ros::Publisher status_pub_;
   ros::Publisher status_stamped_pub_;
+  ros::Publisher pointcloud_pub_;
+  string pointcloud_filtered_name_;
 
   //! Subscribers
-  ros::Subscriber example_sub_;
-  string example_subscriber_name_; // Name of the example_sub_ topic
+  ros::Subscriber pointcloud_sub_;
+  string pointcloud_in_name_;
 
   //! Services
   ros::ServiceServer example_server_;
 
   //! Callbacks
-  void exampleSubCb(const std_msgs::String::ConstPtr& msg);
-
-  bool exampleServerCb(std_srvs::Trigger::Request& request, std_srvs::Trigger::Response& response);
+  void pointCloudSubCb(const sensor_msgs::PointCloud2::ConstPtr& msg);
 
   /* ROS stuff !*/
 
   /* PointCloudFilters stuff */
 
   std_msgs::String status_;
+  sensor_msgs::PointCloud2 pointcloud_filtered_;
+
+  virtual sensor_msgs::PointCloud2 pointCloudFilter(const sensor_msgs::PointCloud2::ConstPtr& msg);
 
   /* PointCloudFilters stuff !*/
-
 
 };
 
