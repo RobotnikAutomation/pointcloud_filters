@@ -54,7 +54,8 @@ void LowerResolutionFilter::initState()
 {
   PointCloudFilters::initState();
 
-  // Init state...
+  RCOMPONENT_INFO_STREAM("Frequency: " << desired_freq_);
+  RCOMPONENT_INFO_STREAM("Reduce points factor: " << reduce_points_factor_);
 }
 
 void LowerResolutionFilter::standbyState()
