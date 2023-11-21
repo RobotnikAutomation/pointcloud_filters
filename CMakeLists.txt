@@ -15,7 +15,7 @@ catkin_package(
   INCLUDE_DIRS
     include
   LIBRARIES
-    ${PROJECT_NAME}
+    pointcloud2_filters
   CATKIN_DEPENDS
     roscpp
     std_msgs
@@ -35,11 +35,11 @@ include_directories(
 )
 
 ## Declare a C++ library
-add_library(${PROJECT_NAME} src/lower_resolution_filter.cpp src/pointcloud_filters.cpp)
-add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_library(pointcloud2_filters src/lower_resolution_filter.cpp src/pointcloud_filters.cpp)
+add_dependencies(pointcloud2_filters ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library target against
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(pointcloud2_filters
   ${catkin_LIBRARIES}
 )
 
@@ -52,11 +52,11 @@ add_dependencies(pointcloud_filters_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${c
 ## Specify libraries to link a executable target against
 target_link_libraries(lower_resolution_filter_node
   ${catkin_LIBRARIES}
-  ${PROJECT_NAME}
+  pointcloud2_filters
 )
 target_link_libraries(pointcloud_filters_node
   ${catkin_LIBRARIES}
-  ${PROJECT_NAME}
+  pointcloud2_filters
 )
 
 #############
@@ -64,7 +64,7 @@ target_link_libraries(pointcloud_filters_node
 #############
 
 ## Mark executables and/or libraries for installation
-install(TARGETS ${PROJECT_NAME} lower_resolution_filter_node pointcloud_filters_node
+install(TARGETS pointcloud2_filters lower_resolution_filter_node pointcloud_filters_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
